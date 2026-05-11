@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova-Pilot Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .chat-container { width: 450px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #27ae60; padding-bottom: 10px; }
+        #chat-box { height: 350px; border: 1px solid #eee; padding: 15px; overflow-y: auto; margin-bottom: 15px; background: #fafafa; border-radius: 8px; display: flex; flex-direction: column; }
+        .user-msg { align-self: flex-end; background: #dcf8c6; color: #333; padding: 8px 12px; border-radius: 15px 15px 0 15px; margin-bottom: 10px; max-width: 80%; }
+        .nova-msg { align-self: flex-start; background: #fff; border: 1px solid #ddd; color: #2c3e50; padding: 8px 12px; border-radius: 15px 15px 15px 0; margin-bottom: 15px; max-width: 80%; font-style: italic; }
+        .input-area { display: flex; gap: 10px; }
+        input { flex-grow: 1; padding: 12px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
+        button { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #219150; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Nova-Pilot 1.0</h2>
+        <div id="chat-box"></div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Wetin dey sup?" onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            if (!input.value.trim()) return;
+
+            const query = input.value;
+            chatBox.innerHTML += `<div class="user-msg"><b>You:</b> ${query}</div>`;
+            input.value = '';
+
+            // Loading state
+            const loadingId = "loading-" + Date.now();
+            chatBox.innerHTML += `<div id="${loadingId}" class="nova-msg">Nova-Pilot is thinking...</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+                const data = await response.json();
+                
+                document.getElementById(loadingId).remove();
+                chatBox.innerHTML += `<div class="nova-msg"><b>Nova-Pilot:</b> ${data.response}</div>`;
+            } catch (error) {
+                document.getElementById(loadingId).innerHTML = "<b>Nova-Pilot:</b> Wahala dey connect, try again.";
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
