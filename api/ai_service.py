@@ -2,8 +2,8 @@
 import os
 from dotenv import load_dotenv # Add this
 from groq import Groq
-from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+# from langchain_community.vectorstores import FAISS
+# from langchain_huggingface import HuggingFaceEmbeddings
 
 # Manually point to the .env file
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
