@@ -1,28 +1,27 @@
-# api/ai_service.py
 import os
-from dotenv import load_dotenv # Add this
 from groq import Groq
-# from langchain_community.vectorstores import FAISS
-# from langchain_huggingface import HuggingFaceEmbeddings
 
-# Manually point to the .env file
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENV_PATH = os.path.join(BASE_DIR, ".env")
-load_dotenv(ENV_PATH) # Force load from the root .env
+# 1. Look for the key directly in the system (Render Environment)
+api_key = os.environ.get("GROQ_API_KEY")
 
-# Now fetch the key
-api_key = os.getenv("GROQ_API_KEY")
-
+# 2. Only use dotenv as a fallback for your local PC
 if not api_key:
-    raise ValueError("GROQ_API_KEY not found! Check your .env file in the root folder.")
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+        api_key = os.getenv("GROQ_API_KEY")
+    except ImportError:
+        pass
 
-client = Groq(api_key=api_key)
-# ... keep the rest of your code the same
+# 3. Don't "raise" a hard error here, just handle it in the function
+client = None
+if api_key:
+    client = Groq(api_key=api_key)
 
 def get_nova_response(user_query, history=None):
-    if history is None:
-        history = []
-        
+    if not client:
+        return "System error: Groq API Key is missing on the server. Check Render Environment settings."
+            
     messages = [
         {"role": "system", "content": "You are Nova-Pilot, a helpful customer support agent for Terranova Spaces."}
     ]

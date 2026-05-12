@@ -1,11 +1,10 @@
-# novapay_backend/urls.py
-
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect # Import this
 
 urlpatterns = [
-    # Change 'local_admin_url' to 'urls'
     path('admin/', admin.site.urls), 
-    
     path('api/', include('api.urls')),
+    # Add this line to redirect the empty path to your dashboard
+    path('', lambda request: redirect('api/dashboard/', permanent=False)),
 ]
