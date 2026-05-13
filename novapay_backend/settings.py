@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$0ynf660p(rmp&va9asus5_tuorx_n_5!f#3*y6anox7ih=q9t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['*']  # This is the "No-Wahala" setting for now
 # ALLOWED_HOSTS = ['customer-agent-pro.onrender.com', 'localhost', '127.0.0.1', '.onrender.com']
 
