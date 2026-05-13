@@ -5,7 +5,7 @@ import json
 
 # 1. ADD THIS: This serves the actual website page
 def chat_page(request):
-    return render(request, 'api/dashboard.html') 
+    return render(request, 'api/chat.html') 
 
 # 2. KEEP THIS: This handles the AI logic
 def chat_api(request):

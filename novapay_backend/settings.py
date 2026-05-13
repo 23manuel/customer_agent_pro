@@ -52,10 +52,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'novapay_backend.urls'
 
+# settings.py
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], # Make sure 'os' is imported at the top!
+        'DIRS': [BASE_DIR / 'templates'],  # THIS IS THE FIX!
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
