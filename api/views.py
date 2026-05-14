@@ -3,9 +3,10 @@ from django.http import JsonResponse
 from .ai_service import get_nova_response
 import json
 
-# 1. ADD THIS: This serves the actual website page
+# views.py
 def chat_page(request):
-    return render(request, 'api/chat.html') 
+    # Changed from 'api/chat.html' to just 'chat.html'
+    return render(request, 'chat.html')
 
 # 2. KEEP THIS: This handles the AI logic
 def chat_api(request):
