@@ -28,17 +28,34 @@
     </div>
 
     <script>
+        let sessionId = localStorage.getItem('nova_session_id');
+        if (!sessionId) {
+            sessionId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('nova_session_id', sessionId);
+        }
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                })[m];
+            });
+        }
+
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
             if (!input.value.trim()) return;
 
             const query = input.value;
-            chatBox.innerHTML += `<div class="user-msg"><b>You:</b> ${query}</div>`;
+            chatBox.innerHTML += `<div class="user-msg"><b>You:</b> ${escapeHTML(query)}</div>`;
             input.value = '';
 
             // Loading state
-            const loadingId = "loading-" + Date.now();
+            const loadingId = "loading-" + Date.now() + "-" + Math.floor(Math.random() * 1000000);
             chatBox.innerHTML += `<div id="${loadingId}" class="nova-msg">Nova-Pilot is thinking...</div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -46,7 +63,7 @@
                 const response = await fetch('/api/chat/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: query })
+                    body: JSON.stringify({ query: query, session_id: sessionId })
                 });
                 const data = await response.json();
                 
