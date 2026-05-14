@@ -1,9 +1,11 @@
 from django.shortcuts import render # Add this import!
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .ai_service import get_nova_response
 import json
 
 # views.py
+@csrf_exempt
 def chat_page(request):
     # Changed from 'api/chat.html' to just 'chat.html'
     return render(request, 'chat.html')

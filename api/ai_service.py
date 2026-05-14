@@ -34,7 +34,7 @@ def get_nova_response(user_query, history=None):
 
         # THE FIX: Accessing the content correctly
         # completion.choices is a list, so we access index
-        return completion.choices.message.content
+        return completion.choices[0].message.content
 
     except Exception as e:
         # This will print the exact error to your Render Logs
