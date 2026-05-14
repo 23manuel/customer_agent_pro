@@ -4,15 +4,6 @@ from groq import Groq
 # 1. Direct Environment check for Render
 api_key = os.environ.get("GROQ_API_KEY")
 
-# 2. Local fallback
-if not api_key:
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-        api_key = os.getenv("GROQ_API_KEY")
-    except ImportError:
-        pass
-
 def get_nova_response(user_query, history=None):
     if not api_key:
         return "Oga, check Render Settings. GROQ_API_KEY is missing!"
@@ -32,11 +23,9 @@ def get_nova_response(user_query, history=None):
             temperature=0.7,
         )
 
-        # THE FIX: Accessing the content correctly
-        # completion.choices is a list, so we access index
-        return completion.choices[0].message.content
+        # THE FIX: Added because choices is a list
+        return completion.choices.message.content
 
     except Exception as e:
-        # This will print the exact error to your Render Logs
         print(f"Deployment Log - Groq Error: {str(e)}")
-        return "Network dey slow or AI vexed, abeg try again."
+        return "Wahala dey connect, try again."
