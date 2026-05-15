@@ -1,8 +1,12 @@
 import os
 import re
 import json
+from dotenv import load_dotenv
 from groq import Groq
 from .models import AccountRequest, PriceComparison
+
+# Load environment variables
+load_dotenv()
 
 # Load improved prompt if exists
 try:
@@ -15,22 +19,49 @@ except FileNotFoundError:
 # 1. Direct Environment check for Render
 api_key = os.environ.get("GROQ_API_KEY")
 
+def is_business_query(query):
+    """Check if query needs document retrieval"""
+    business_keywords = [
+        'policy', 'refund', 'account', 'fee', 'charge', 'limit',
+        'transfer', 'payment', 'loan', 'credit', 'support', 'help',
+        'complaint', 'issue', 'problem', 'how', 'what', 'when', 'where'
+    ]
+    query_lower = query.lower()
+    return any(keyword in query_lower for keyword in business_keywords)
+
+def get_document_answer(query):
+    """Get answer from policy documents using lightweight search"""
+    try:
+        from ai_engine.rag_pipeline import get_answer_with_score
+        status, response, score = get_answer_with_score(query)
+        if status == "SUCCESS" and score > 0.1:
+            return response
+    except Exception as e:
+        print(f"Document search error: {e}")
+    return None
+
 def get_nova_response(user_query, history=None):
     if not api_key:
         return "Oga, check Render Settings. GROQ_API_KEY is missing!"
 
     try:
+        # Check if this is a business query that needs document retrieval
+        if is_business_query(user_query):
+            doc_answer = get_document_answer(user_query)
+            if doc_answer:
+                return doc_answer
+
         client = Groq(api_key=api_key)
-        system_prompt = IMPROVED_SYSTEM_PROMPT or """You are Nova-Pilot, a highly skilled Client Support Specialist for Nova Pay. 
+        system_prompt = IMPROVED_SYSTEM_PROMPT or """You are Nova-Pilot, a highly skilled Client Support Specialist for Nova Pay.
         You help clients create accounts, compare prices, and handle complex discussions flawlessly.
         Be conversational, helpful, and remember context from previous interactions.
         Always aim to provide personalized, retentive responses that make clients feel valued."""
-        
+
         messages = [{"role": "system", "content": system_prompt}]
-        
+
         if history:
             messages.extend(history[-10:])  # Keep last 10 messages for context
-            
+
         messages.append({"role": "user", "content": user_query})
 
         completion = client.chat.completions.create(
